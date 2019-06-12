@@ -16,19 +16,19 @@ public class CellMetrics {
     };
 
     public static Vector3 GetFirstSolidCorner (Direction direction) {
-        return corners[(int) direction / 2];
-    }
-
-    public static Vector3 GetSecondSolidCorner (Direction direction) {
-        return corners[((int) direction / 2) + 1];
-    }
-
-    public static Vector3 GetFirsBlendedCorner (Direction direction) {
         return corners[(int) direction / 2] * solidFactor;
     }
 
-    public static Vector3 GetSecondBlendedCorner (Direction direction) {
+    public static Vector3 GetSecondSolidCorner (Direction direction) {
         return corners[((int) direction / 2) + 1] * solidFactor;
+    }
+
+    public static Vector3 GetFirstBlendedCorner (Direction direction) {
+        return corners[(int) direction / 2];
+    }
+
+    public static Vector3 GetSecondBlendedCorner (Direction direction) {
+        return corners[((int) direction / 2) + 1];
     }
 
 
