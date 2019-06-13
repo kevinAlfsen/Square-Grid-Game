@@ -4,7 +4,7 @@ public class CellMetrics {
     public const float height = 10f;
     public const float width = 10f;
 
-    public const float solidFactor = 0.75f;
+    public const float solidFactor = 0.90f;
     public const float blendFactor = 1f - solidFactor;
 
     public static Vector3[] corners = {
@@ -31,6 +31,8 @@ public class CellMetrics {
         return corners[((int) direction / 2) + 1] * solidFactor;
     }
 
-
+    public static Vector3 GetBridge (Direction direction) {
+        return (corners[(int) direction / 2] + corners[((int) direction / 2) + 1]) * blendFactor;
+    }
 
 }
