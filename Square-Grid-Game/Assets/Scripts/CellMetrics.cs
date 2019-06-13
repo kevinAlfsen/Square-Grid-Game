@@ -31,6 +31,8 @@ public class CellMetrics {
         return corners[((int) direction / 2) + 1];
     }
 
-
+    public static Vector3 GetBridge (Direction direction) {
+        return (corners[(int) direction / 2] + corners[((int) direction / 2) + 1]) * blendFactor;
+    }
 
 }
