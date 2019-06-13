@@ -38,10 +38,6 @@ public class GridMesh : MonoBehaviour {
     }
 
     void Triangulate (Cell cell) {
-<<<<<<< Updated upstream
-        for (Direction d = Direction.N; d < Direction.NW; d+=2) {
-            Triangulate (d, cell);
-=======
         Vector3 center = cell.transform.localPosition;
 
         Vector3 v1 = center + CellMetrics.GetFirstSolidCorner (Direction.N);
@@ -54,7 +50,6 @@ public class GridMesh : MonoBehaviour {
 
         for (Direction d = Direction.N; d <= Direction.E; d++) {
             TriangulateConnection (d, cell);
->>>>>>> Stashed changes
         }
     }
 
@@ -70,17 +65,6 @@ public class GridMesh : MonoBehaviour {
 
             Cell neighbor = cell.GetNeighbor (direction);
 
-<<<<<<< Updated upstream
-        AddTriangleColor (cell.color, edgeColor, edgeColor);
-
-        /*Vector3 v1 = center + CellMetrics.corners[0];
-        Vector3 v2 = center + CellMetrics.corners[1];
-        Vector3 v3 = center + CellMetrics.corners[2];
-        Vector3 v4 = center + CellMetrics.corners[3];
-
-        AddQuad (v1, v2, v3, v4);
-        AddQuadColor (cell.color);*/
-=======
             AddQuad (v1, v2, v3, v4);
             AddQuadColor (cell.color, neighbor.color, neighbor.color, cell.color);
         } else if (cell.GetNeighbor (direction) != null) {
@@ -104,40 +88,6 @@ public class GridMesh : MonoBehaviour {
                 nextNeighbor.color
                 );
         }
-
-        /*Vector3 center = cell.transform.localPosition;
-
-        if ((int) direction % 2 == 0 && cell.GetNeighbor (direction) != null) {
-            Vector3 bridge = CellMetrics.GetBridge (direction);
-            Vector3 v1 = center + CellMetrics.GetFirstSolidCorner (direction);
-            Vector3 v2 = v1 + bridge;
-
-            Vector3 v4 = center + CellMetrics.GetSecondSolidCorner (direction);
-            Vector3 v3 = v4 + bridge;
-
-            Cell neighbor = cell.GetNeighbor (direction) ?? cell;
-            Color edgeColor = (neighbor.color + cell.color) / 2f;
-
-            AddQuad (v1, v2, v3, v4);
-            AddQuadColor (cell.color, edgeColor, edgeColor, cell.color);
-        } else if (cell.GetNeighbor (direction) != null){
-            Vector3 bridge = CellMetrics.GetBridge (direction);
-
-            Vector3 v1 = center + CellMetrics.GetSecondSolidCorner(direction);
-            Vector3 v2 = v1 + bridge;
-            Vector3 v3 = center + CellMetrics.GetSecondBlendedCorner(direction);
-            Vector3 v4 = v3 - bridge;
-
-            Debug.Log (((int) direction).ToString ());
-
-            Cell neighbor = cell.GetNeighbor (direction);
-            Cell prevNeightbor = cell.GetNeighbor (direction.Previous ());
-            Cell nextNeighbor = cell.GetNeighbor (direction.Next ());
-
-            AddQuad (v1, v2, v3, v4);
-            AddQuadColor (cell.color, (cell.color + prevNeightbor.color) / 2f, (cell.color + neighbor.color + prevNeightbor.color + nextNeighbor.color) / 4f, (cell.color + nextNeighbor.color) / 2f);
-        }*/
->>>>>>> Stashed changes
     }
 
     void AddTriangle (Vector3 v1, Vector3 v2, Vector3 v3) {
@@ -161,8 +111,6 @@ public class GridMesh : MonoBehaviour {
         colors.Add (c2);
         colors.Add (c3);
     }
-<<<<<<< Updated upstream
-=======
 
     void AddQuad (Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4) {
         int vertexIndex = vertices.Count;
@@ -221,5 +169,4 @@ public class GridMesh : MonoBehaviour {
         colors.Add (color);
         colors.Add (color);
     }
->>>>>>> Stashed changes
 }

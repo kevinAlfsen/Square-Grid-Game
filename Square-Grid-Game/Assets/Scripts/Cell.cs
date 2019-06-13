@@ -19,12 +19,4 @@ public class Cell : MonoBehaviour {
         neighbors[(int) direction] = cell;
         cell.neighbors[(int) direction.Opposite ()] = this;
     }
-
-    public Cell GetPreviousNeighbor (Direction direction) {
-        return ((int) direction) > 0 ? neighbors[(int) direction - 1] : neighbors[7];
-    }
-
-    public Cell GetNextNeighbor (Direction direction) {
-        return ((int) direction) < 7 ? neighbors[(int) direction + 1] : neighbors[0];
-    }
 }
