@@ -58,16 +58,25 @@ public class GridMesh : MonoBehaviour {
         Vector3 v1 = center + CellMetrics.GetFirstSolidCorner (direction);
         Vector3 v4 = center + CellMetrics.GetSecondSolidCorner (direction);
         Vector3 bridge = CellMetrics.GetBridge (direction);
+        Cell neighbor = cell.GetNeighbor (direction);
 
         if ((int) direction % 2 == 0 && cell.GetNeighbor (direction) != null) {
             Vector3 v2 = v1 + bridge;
             Vector3 v3 = v4 + bridge;
+            v2.y = v3.y = neighbor.Elevation * CellMetrics.elevationStep;
 
-            Cell neighbor = cell.GetNeighbor (direction);
+            
 
-            AddQuad (v1, v2, v3, v4);
-            AddQuadColor (cell.color, neighbor.color, neighbor.color, cell.color);
+            if (cell.GetEdgeType (direction) == EdgeType.Slope) {
+                TriangulateEdgeTerraces (cell, neighbor, v1, v2, v3, v4);
+            } else {
+                AddQuad (v1, v2, v3, v4);
+                AddQuadColor (cell.color, neighbor.color, neighbor.color, cell.color);
+            }
         } else if (cell.GetNeighbor (direction) != null) {
+            Cell prevNeighbor = cell.GetNeighbor (direction.Previous ());
+            Cell nextNeighbor = cell.GetNeighbor (direction.Next ());
+
             Vector3 nextBridge = CellMetrics.GetBridge (direction.Next ());
             center += CellMetrics.GetSecondBlendedCorner (direction);
             v1 = v4;
@@ -75,9 +84,11 @@ public class GridMesh : MonoBehaviour {
             Vector3 v3 = v2 + nextBridge;
             v4 = v3 - bridge;
 
-            Cell prevNeighbor = cell.GetNeighbor (direction.Previous ());
-            Cell neighbor = cell.GetNeighbor (direction);
-            Cell nextNeighbor = cell.GetNeighbor (direction.Next ());
+            v2.y = prevNeighbor.Elevation * CellMetrics.elevationStep;
+            v3.y = neighbor.Elevation * CellMetrics.elevationStep;
+            v4.y = nextNeighbor.Elevation * CellMetrics.elevationStep;
+
+            center.y = (cell.Elevation + neighbor.Elevation) * CellMetrics.elevationStep * 0.5f;
 
             AddFourTriQuad (center, v1, v2, v3, v4);
             AddFourTriQuadColor (
@@ -88,6 +99,29 @@ public class GridMesh : MonoBehaviour {
                 nextNeighbor.color
                 );
         }
+    }
+
+    void TriangulateEdgeTerraces (Cell beginCell, Cell endCell, Vector3 beginLeft, Vector3 endLeft, Vector3 endRight, Vector3 beginRight) {
+        Vector3 v2 = CellMetrics.TerraceLerp (beginLeft, endLeft, 1);
+        Vector3 v3 = CellMetrics.TerraceLerp (beginRight, endRight, 1);
+        Color c2 = CellMetrics.TerraceLerp (beginCell.color, endCell.color, 1);
+
+        AddQuad (beginLeft, v2, v3, beginRight);
+        AddQuadColor (beginCell.color, c2, c2, beginCell.color);
+
+        for (int i = 2; i < CellMetrics.terraceSteps; i++) {
+            Vector3 v1 = v2;
+            Vector3 v4 = v3;
+            Color c1 = c2;
+            v2 = CellMetrics.TerraceLerp (beginLeft, endLeft, i);
+            v3 = CellMetrics.TerraceLerp (beginRight, endRight, i);
+            c2 = CellMetrics.TerraceLerp (beginCell.color, endCell.color, i);
+            AddQuad (v1, v2, v3, v4);
+            AddQuadColor (c1, c2, c2, c1);
+        }
+
+        AddQuad (v2, endLeft, endRight, v3);
+        AddQuadColor (c2, endCell.color, endCell.color, c2);
     }
 
     void AddTriangle (Vector3 v1, Vector3 v2, Vector3 v3) {

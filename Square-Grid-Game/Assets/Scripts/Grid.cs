@@ -32,12 +32,14 @@ public class Grid : MonoBehaviour {
         mesh.Triangulate (cells);
     }
 
-    public void ColorCell (Vector3 position, Color color) {
+    public Cell GetCell (Vector3 position) {
         position = transform.InverseTransformPoint (position);
         GridCoordinates coordinates = GridCoordinates.FromPosition (position);
         int index = coordinates.X + coordinates.Z * width;
-        Cell cell = cells[index];
-        cell.color = color;
+        return cells[index];
+    }
+
+    public void Refresh () {
         mesh.Triangulate (cells);
     }
 
@@ -84,6 +86,8 @@ public class Grid : MonoBehaviour {
         Text label = Instantiate<Text> (cellLabelPrefab, cellLabelCanvas.transform, false);
         label.transform.localPosition = new Vector2(position.x, position.z);
         label.text = cell.coordinates.ToString ();
+
+        cell.uiRect = label.rectTransform;
 
 
 

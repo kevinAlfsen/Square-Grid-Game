@@ -7,6 +7,7 @@ public class MapEditor : MonoBehaviour {
 
     Color activeColor;
     Color neighborColor;
+    int activeElevation;
 
     bool showNeighbors = false;
 
@@ -28,10 +29,16 @@ public class MapEditor : MonoBehaviour {
             if (showNeighbors) {
                 grid.ColorCellNeighbors (hit.point, neighborColor);
             } else {
-                grid.ColorCell (hit.point, activeColor);
+                EditCell(grid.GetCell(hit.point));
             }
             
         }
+    }
+
+    void EditCell (Cell cell) {
+        cell.color = activeColor;
+        cell.Elevation = activeElevation;
+        grid.Refresh ();
     }
 
     public void SelectColor (int index) {
@@ -41,5 +48,9 @@ public class MapEditor : MonoBehaviour {
 
     public void ToggleShowNeighbors () {
         showNeighbors = !showNeighbors;
+    }
+
+    public void SetElevation (float elevation) {
+        activeElevation = (int) elevation;
     }
 }
