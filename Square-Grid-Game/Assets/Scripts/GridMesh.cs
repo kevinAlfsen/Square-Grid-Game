@@ -40,6 +40,63 @@ public class GridMesh : MonoBehaviour {
     void Triangulate (Cell cell) {
         Vector3 center = cell.transform.localPosition;
 
+        Vector3 v1 = center + CellMetrics.corners[0];
+        Vector3 v2 = center + CellMetrics.corners[1];
+        Vector3 v3 = center + CellMetrics.corners[2];
+        Vector3 v4 = center + CellMetrics.corners[3];
+
+        AddQuad (v1, v2, v3, v4);
+        AddQuadColor (cell.Color);
+
+
+        TriangulateConnection (cell, Direction.S);
+        TriangulateConnection (cell, Direction.E);
+    }
+
+    void TriangulateConnection (Cell cell, Direction direction) {
+        Cell neighbor = cell.GetNeighbor (direction);
+
+        if (neighbor != null) {
+            if (cell.hasEdgeInDirection (direction)) {
+                Vector3 center = cell.transform.localPosition;
+
+                Vector3 v1 = center + CellMetrics.GetFirstSolidCorner (direction);
+                Vector3 v4 = center + CellMetrics.GetSecondSolidCorner (direction);
+                Vector3 v2 = v1;
+                Vector3 v3 = v4;
+
+                v2.y = v3.y = cell.GetNeighbor (direction).Elevation * CellMetrics.elevationStep;
+
+                AddQuad (v1, v2, v3, v4);
+
+                if (cell.Elevation > neighbor.Elevation) {
+                    AddQuadColor (cell.Color);
+                } else {
+                    AddQuadColor (neighbor.Color);
+                }
+            }
+        } else if (cell.IsEdge) {
+            Vector3 center = cell.transform.localPosition;
+
+            Vector3 v1 = center + CellMetrics.GetFirstSolidCorner (direction);
+            Vector3 v4 = center + CellMetrics.GetSecondSolidCorner (direction);
+            Vector3 v2 = v1;
+            Vector3 v3 = v4;
+
+            v2.y = v3.y = - 1 * CellMetrics.elevationStep;
+
+            AddQuad (v1, v2, v3, v4);
+            AddQuadColor (cell.Color);
+        }
+
+
+
+
+    }
+
+    /*void Triangulate (Cell cell) {
+        Vector3 center = cell.transform.localPosition;
+
         Vector3 v1 = center + CellMetrics.GetFirstSolidCorner (Direction.N);
         Vector3 v2 = center + CellMetrics.GetSecondSolidCorner (Direction.N);
         Vector3 v3 = center + CellMetrics.GetFirstSolidCorner (Direction.S);
@@ -122,7 +179,7 @@ public class GridMesh : MonoBehaviour {
 
         AddQuad (v2, endLeft, endRight, v3);
         AddQuadColor (c2, endCell.color, endCell.color, c2);
-    }
+    }*/
 
     void AddTriangle (Vector3 v1, Vector3 v2, Vector3 v3) {
         int vertexIndex = vertices.Count;

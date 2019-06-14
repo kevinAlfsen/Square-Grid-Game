@@ -2,59 +2,56 @@
 using UnityEngine.UI;
 
 public class Grid : MonoBehaviour {
-    public int width = 6;
-    public int height = 6;
+    public int chunkCountX = 4;
+    public int chunkCountZ = 3;
+
+    int cellCountX, cellCountZ;
+
+    public Chunk chunkPrefab;
+
+    Chunk[] chunks;
 
     Cell[] cells;
     public Cell cellPrefab;
 
-    GridMesh mesh;
-
-    Canvas cellLabelCanvas;
     public Text cellLabelPrefab;
 
     public Color defaultColor;
 
     void Awake () {
-        mesh = GetComponentInChildren<GridMesh> ();
-        cellLabelCanvas = GetComponentInChildren<Canvas> ();
+        cellCountX = chunkCountX * CellMetrics.chunkSizeX;
+        cellCountZ = chunkCountZ * CellMetrics.chunkSizeZ;
 
-        cells = new Cell[height * width];
+        CreateChunks ();
+        CreateCells ();
+    }
 
-        for (int z = 0, i = 0; z < height; z++) {
-            for (int x = 0; x < width; x++) {
+    void CreateChunks () {
+        chunks = new Chunk[chunkCountX * chunkCountZ];
+
+        for (int z = 0, i = 0; z < chunkCountZ; z++) {
+            for (int x = 0; x < chunkCountX; x++) {
+                Chunk chunk = chunks[i++] = Instantiate<Chunk> (chunkPrefab);
+                chunk.transform.SetParent (transform);
+            }
+        }
+    }
+
+    void CreateCells () {
+        cells = new Cell[cellCountZ * cellCountX];
+
+        for (int z = 0, i = 0; z < cellCountZ; z++) {
+            for (int x = 0; x < cellCountX; x++) {
                 CreateCell (x, z, i++);
             }
         }
     }
 
-    void Start () {
-        mesh.Triangulate (cells);
-    }
-
     public Cell GetCell (Vector3 position) {
         position = transform.InverseTransformPoint (position);
         GridCoordinates coordinates = GridCoordinates.FromPosition (position);
-        int index = coordinates.X + coordinates.Z * width;
+        int index = coordinates.X + coordinates.Z * cellCountX;
         return cells[index];
-    }
-
-    public void Refresh () {
-        mesh.Triangulate (cells);
-    }
-
-    public void ColorCellNeighbors (Vector3 position, Color color) {
-        position = transform.InverseTransformPoint (position);
-        GridCoordinates coordinates = GridCoordinates.FromPosition (position);
-        int index = coordinates.X + coordinates.Z * width;
-        Cell cell = cells[index];
-        for (int i = 0; i < 8; i++) {
-            Cell neighbor = cell.GetNeighbor ((Direction) i);
-            if (neighbor != null) {
-                neighbor.color = color;
-            }
-        }
-        mesh.Triangulate (cells);
     }
 
     void CreateCell (int x, int z, int i) {
@@ -64,32 +61,53 @@ public class Grid : MonoBehaviour {
         position.y = 0f;
         position.z = z * 10f;
 
-        Cell cell = cells[i] = Instantiate<Cell> (cellPrefab, transform, false);
-        cell.transform.SetParent (transform);
+        Cell cell = cells[i] = Instantiate<Cell> (cellPrefab);
         cell.transform.localPosition = position;
         cell.coordinates = new GridCoordinates (x, z);
-        cell.color = defaultColor;
+        cell.Color = defaultColor;
 
         if (x > 0) {
             cell.SetNeighbor (Direction.W, cells[i - 1]);
         }
         if (z > 0) {
-            cell.SetNeighbor (Direction.S, cells[i - width]);
-            if (x < width - 1) {
-                cell.SetNeighbor (Direction.SE, cells[i - width + 1]);
+            cell.SetNeighbor (Direction.S, cells[i - cellCountX]);
+            if (x < cellCountX - 1) {
+                cell.SetNeighbor (Direction.SE, cells[i - cellCountX + 1]);
             }
             if (x > 0) {
-                cell.SetNeighbor (Direction.SW, cells[i - width - 1]);
+                cell.SetNeighbor (Direction.SW, cells[i - cellCountX - 1]);
             }
         }
 
-        Text label = Instantiate<Text> (cellLabelPrefab, cellLabelCanvas.transform, false);
+        Text label = Instantiate<Text> (cellLabelPrefab);
         label.transform.localPosition = new Vector2(position.x, position.z);
         label.text = cell.coordinates.ToString ();
 
         cell.uiRect = label.rectTransform;
+        cell.Elevation = 0;
 
+        if (z == 0 || x == cellCountX - 1) {
+            cell.IsEdge = true;
+        } 
 
+        AddCellToChunk (x, z, cell);
+    }
 
+    void AddCellToChunk (int x, int z, Cell cell) {
+        int chunkX = x / CellMetrics.chunkSizeX;
+        int chunkZ = z / CellMetrics.chunkSizeZ;
+
+        Chunk chunk = chunks[chunkX + chunkZ * chunkCountX];
+
+        int localX = x - chunkX * CellMetrics.chunkSizeX;
+        int localZ = z - chunkZ * CellMetrics.chunkSizeZ;
+
+        chunk.AddCell (localX + localZ * CellMetrics.chunkSizeX, cell);
+    }
+
+    public void ToggleLabels () {
+        for (int i = 0; i < chunks.Length; i++) {
+            chunks[i].ToggleCanvas ();
+        }
     }
 }

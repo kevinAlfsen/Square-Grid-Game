@@ -6,14 +6,10 @@ public class MapEditor : MonoBehaviour {
     public Grid grid;
 
     Color activeColor;
-    Color neighborColor;
     int activeElevation;
-
-    bool showNeighbors = false;
 
     void Awake () {
         SelectColor(0);
-        neighborColor = Color.red;
     }
 
     void Update () {
@@ -26,28 +22,17 @@ public class MapEditor : MonoBehaviour {
         Ray inputRay = Camera.main.ScreenPointToRay (Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast (inputRay, out hit)) {
-            if (showNeighbors) {
-                grid.ColorCellNeighbors (hit.point, neighborColor);
-            } else {
-                EditCell(grid.GetCell(hit.point));
-            }
-            
+                EditCell(grid.GetCell(hit.point));  
         }
     }
 
     void EditCell (Cell cell) {
-        cell.color = activeColor;
+        cell.Color = activeColor;
         cell.Elevation = activeElevation;
-        grid.Refresh ();
     }
 
     public void SelectColor (int index) {
         activeColor = colors[index];
-        //neighborColor = index < 3 ? colors[index + 1] : colors[0];
-    }
-
-    public void ToggleShowNeighbors () {
-        showNeighbors = !showNeighbors;
     }
 
     public void SetElevation (float elevation) {

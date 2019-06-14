@@ -2,14 +2,17 @@
 
 public class Cell : MonoBehaviour {
     public GridCoordinates coordinates;
-    public Color color;
     public RectTransform uiRect;
+    public Chunk chunk;
 
     public int Elevation {
         get {
             return elevation;
         }
         set {
+            if (elevation == value) {
+                return;
+            }
             elevation = value;
             Vector3 position = transform.localPosition;
             position.y = value * CellMetrics.elevationStep;
@@ -18,10 +21,37 @@ public class Cell : MonoBehaviour {
             Vector3 uiPosition = uiRect.localPosition;
             uiPosition.z = elevation * -CellMetrics.elevationStep;
             uiRect.localPosition = uiPosition;
+
+            Refresh ();
         }
     }
 
-    int elevation;
+    public Color Color {
+        get {
+            return color;
+        }
+        set {
+            if (color == value) {
+                return;
+            }
+
+            color = value;
+            Refresh ();
+        }
+    }
+
+    public bool IsEdge {
+        get {
+            return isEdge;
+        }
+        set {
+            isEdge = value;
+        }
+    }
+
+    Color color;
+    bool isEdge = false;
+    int elevation = int.MinValue;
 
     [SerializeField]
     Cell[] neighbors;
@@ -39,7 +69,23 @@ public class Cell : MonoBehaviour {
         cell.neighbors[(int) direction.Opposite ()] = this;
     }
 
-    public EdgeType GetEdgeType (Direction direction) {
-        return CellMetrics.GetEdgeType (elevation, GetNeighbor (direction).elevation);
+    public bool hasEdgeInDirection (Direction direction) {
+        if (elevation != GetNeighbor (direction).elevation) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    void Refresh () {
+        if (chunk) {
+            chunk.Refresh ();
+            for (int i = 0; i < neighbors.Length; i++) {
+                Cell neighbor = neighbors[i];
+                if (neighbor != null && neighbor.chunk != this.chunk) {
+                    neighbor.Refresh ();
+                }
+            }
+        }
     }
 }
