@@ -30,4 +30,30 @@ public class CellMetrics {
     public static Vector3 GetBridge (Direction direction) {
         return (corners[(int) direction / 2] + corners[((int) direction / 2) + 1]) * 0.1f;
     }
+
+    public const int hashGridSize = 256;
+
+    static float[] hashGrid;
+
+    public static void InitializeHashGrid (int seed) {
+        hashGrid = new float[hashGridSize * hashGridSize];
+        Random.State currentState = Random.state;
+        Random.InitState (seed);
+        for (int i = 0; i < hashGrid.Length; i++) {
+            hashGrid[i] = Random.value;
+        }
+        Random.state = currentState;
+    }
+
+    public static float SampleHasGrid (Vector3 position) {
+        int x = (int) position.x % hashGridSize;
+        if (x < 0) {
+            x += hashGridSize;
+        }
+        int z = (int) position.z % hashGridSize;
+        if (z < 0) {
+            z += hashGridSize;
+        }
+        return hashGrid[x + z * hashGridSize];
+    }
 }

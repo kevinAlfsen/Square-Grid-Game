@@ -18,9 +18,13 @@ public class Grid : MonoBehaviour {
 
     public Color defaultColor;
 
+    public int seed;
+
     void Awake () {
         cellCountX = chunkCountX * CellMetrics.chunkSizeX;
         cellCountZ = chunkCountZ * CellMetrics.chunkSizeZ;
+
+        CellMetrics.InitializeHashGrid (seed);
 
         CreateChunks ();
         CreateCells ();

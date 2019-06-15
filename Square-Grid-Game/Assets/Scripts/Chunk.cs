@@ -7,6 +7,8 @@ public class Chunk : MonoBehaviour {
     public GridMesh terrain, water;
     Canvas gridCanvas;
 
+    public FeatureManager features;
+
     void Awake () {
         gridCanvas = GetComponentInChildren<Canvas> ();
 
@@ -21,6 +23,7 @@ public class Chunk : MonoBehaviour {
     void Triangulate (Cell[] cells) {
         terrain.Clear ();
         water.Clear ();
+        features.Clear ();
 
         for (int i = 0; i < cells.Length; i++) {
             Triangulate (cells[i]);
@@ -28,6 +31,7 @@ public class Chunk : MonoBehaviour {
 
         terrain.Apply ();
         water.Apply ();
+        features.Apply ();
     }
 
     void Triangulate (Cell cell) {
@@ -57,6 +61,13 @@ public class Chunk : MonoBehaviour {
 
         TriangulateConnection (cell, Direction.S);
         TriangulateConnection (cell, Direction.E);
+
+        if (!cell.isUnderWater) {
+            features.AddFeature (cell.transform.localPosition);
+            for (Direction d = Direction.N; d < Direction.NW; d += 2) {
+                features.AddFeature (cell.transform.localPosition + (CellMetrics.GetFirstSolidCorner (d)) * 1/3f);
+            }
+        }
     }
 
     void TriangulateConnection (Cell cell, Direction direction) {
