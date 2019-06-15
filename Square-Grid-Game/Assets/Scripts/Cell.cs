@@ -40,6 +40,25 @@ public class Cell : MonoBehaviour {
         }
     }
 
+    public int WaterLevel {
+        get {
+            return waterLevel;
+        }
+        set {
+            if (waterLevel == value) {
+                return;
+            }
+            waterLevel = value;
+            Refresh ();
+        }
+    }
+
+    public float WaterSurfaceY {
+        get {
+            return (waterLevel + CellMetrics.waterElevationOffset) * CellMetrics.elevationStep;
+        }
+    }
+
     public bool IsEdge {
         get {
             return isEdge;
@@ -49,9 +68,16 @@ public class Cell : MonoBehaviour {
         }
     }
 
+    public bool isUnderWater {
+        get {
+            return waterLevel > elevation;
+        }
+    }
+
     Color color;
     bool isEdge = false;
     int elevation = int.MinValue;
+    int waterLevel;
 
     [SerializeField]
     Cell[] neighbors;
@@ -83,7 +109,7 @@ public class Cell : MonoBehaviour {
             for (int i = 0; i < neighbors.Length; i++) {
                 Cell neighbor = neighbors[i];
                 if (neighbor != null && neighbor.chunk != this.chunk) {
-                    neighbor.Refresh ();
+                    neighbor.chunk.Refresh ();
                 }
             }
         }

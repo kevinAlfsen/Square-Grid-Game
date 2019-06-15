@@ -5,7 +5,7 @@ public class Grid : MonoBehaviour {
     public int chunkCountX = 4;
     public int chunkCountZ = 3;
 
-    int cellCountX, cellCountZ;
+    public int cellCountX, cellCountZ;
 
     public Chunk chunkPrefab;
 
@@ -50,6 +50,11 @@ public class Grid : MonoBehaviour {
     public Cell GetCell (Vector3 position) {
         position = transform.InverseTransformPoint (position);
         GridCoordinates coordinates = GridCoordinates.FromPosition (position);
+        int index = coordinates.X + coordinates.Z * cellCountX;
+        return cells[index];
+    }
+
+    public Cell GetCell (GridCoordinates coordinates) {
         int index = coordinates.X + coordinates.Z * cellCountX;
         return cells[index];
     }

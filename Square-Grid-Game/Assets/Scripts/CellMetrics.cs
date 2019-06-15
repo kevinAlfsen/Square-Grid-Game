@@ -9,6 +9,8 @@ public class CellMetrics {
 
     public const float elevationStep = 2f;
 
+    public const float waterElevationOffset = -0.5f;
+
     public static Vector3[] corners = {
         new Vector3(-width * 0.5f, 0f, height * 0.5f),
         new Vector3(width * 0.5f, 0f, height * 0.5f),
