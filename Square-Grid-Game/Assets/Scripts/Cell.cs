@@ -5,6 +5,17 @@ public class Cell : MonoBehaviour {
     public RectTransform uiRect;
     public Chunk chunk;
 
+    public Unit Unit { get; set; }
+
+    public int ForestLevel {
+        get {
+            return forestLevel;
+        } set {
+            forestLevel = value;
+            Refresh ();
+        }
+    }
+
     public int Elevation {
         get {
             return elevation;
@@ -74,16 +85,38 @@ public class Cell : MonoBehaviour {
         }
     }
 
-    Color color;
+    public int SpecialIndex {
+        get {
+            return specialIndex;
+        }
+        set {
+            if (specialIndex != value) {
+                specialIndex = value;
+                Refresh ();
+            }
+        }
+    }
+
+    public bool IsSpecial {
+        get {
+            return specialIndex > 0;
+        }
+    }
+
+    Color color = Color.blue;
     bool isEdge = false;
-    int elevation = int.MinValue;
-    int waterLevel;
+    int elevation = 0;
+    int waterLevel = 2;
+    int forestLevel = 0;
+    int specialIndex = 0;
 
     [SerializeField]
     Cell[] neighbors;
+    Transform[] features;
 
     void Awake () {
         neighbors = new Cell[8];
+        features = new Transform[8];
     }
 
     public Cell GetNeighbor (Direction direction) {
@@ -111,6 +144,9 @@ public class Cell : MonoBehaviour {
                 if (neighbor != null && neighbor.chunk != this.chunk) {
                     neighbor.chunk.Refresh ();
                 }
+            }
+            if (Unit) {
+                Unit.ValidateLocation ();
             }
         }
     }

@@ -11,6 +11,8 @@ public class CellMetrics {
 
     public const float waterElevationOffset = -0.5f;
 
+    public const float hashGridScale = 0.25f;
+
     public static Vector3[] corners = {
         new Vector3(-width * 0.5f, 0f, height * 0.5f),
         new Vector3(width * 0.5f, 0f, height * 0.5f),
@@ -33,24 +35,24 @@ public class CellMetrics {
 
     public const int hashGridSize = 256;
 
-    static float[] hashGrid;
+    static HashGrid[] hashGrid;
 
     public static void InitializeHashGrid (int seed) {
-        hashGrid = new float[hashGridSize * hashGridSize];
+        hashGrid = new HashGrid[hashGridSize * hashGridSize];
         Random.State currentState = Random.state;
         Random.InitState (seed);
         for (int i = 0; i < hashGrid.Length; i++) {
-            hashGrid[i] = Random.value;
+            hashGrid[i] = HashGrid.Create();
         }
         Random.state = currentState;
     }
 
-    public static float SampleHasGrid (Vector3 position) {
-        int x = (int) position.x % hashGridSize;
+    public static HashGrid SampleHashGrid (Vector3 position) {
+        int x = (int) (position.x * hashGridScale) % hashGridSize;
         if (x < 0) {
             x += hashGridSize;
         }
-        int z = (int) position.z % hashGridSize;
+        int z = (int) (position.z * hashGridScale) % hashGridSize;
         if (z < 0) {
             z += hashGridSize;
         }

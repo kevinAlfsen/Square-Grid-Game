@@ -73,7 +73,6 @@ public class Grid : MonoBehaviour {
         Cell cell = cells[i] = Instantiate<Cell> (cellPrefab);
         cell.transform.localPosition = position;
         cell.coordinates = new GridCoordinates (x, z);
-        cell.Color = defaultColor;
 
         if (x > 0) {
             cell.SetNeighbor (Direction.W, cells[i - 1]);
@@ -93,7 +92,9 @@ public class Grid : MonoBehaviour {
         label.text = cell.coordinates.ToString ();
 
         cell.uiRect = label.rectTransform;
+        /*cell.WaterLevel = 2;
         cell.Elevation = 0;
+        cell.Color = defaultColor;*/
 
         if (z == 0 || x == cellCountX - 1) {
             cell.IsEdge = true;

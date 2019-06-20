@@ -53,21 +53,25 @@ public class Chunk : MonoBehaviour {
             v2 = waterCenter + CellMetrics.corners[1];
             v3 = waterCenter + CellMetrics.corners[2];
             v4 = waterCenter + CellMetrics.corners[3];
-        
+
             water.AddQuad (v1, v2, v3, v4);
+        } 
+
+        if (!cell.isUnderWater) {
+            features.AddFeature (cell, cell.transform.localPosition);
+            for (Direction d = Direction.N; d < Direction.NW; d += 2) {
+                features.AddFeature (cell, cell.transform.localPosition + (CellMetrics.GetFirstSolidCorner (d)) * 1 / 3f);
+            }
+        }
+
+        if (cell.IsSpecial) {
+            features.AddBuilding (cell, cell.transform.localPosition);
         }
         
 
 
         TriangulateConnection (cell, Direction.S);
         TriangulateConnection (cell, Direction.E);
-
-        if (!cell.isUnderWater) {
-            features.AddFeature (cell.transform.localPosition);
-            for (Direction d = Direction.N; d < Direction.NW; d += 2) {
-                features.AddFeature (cell.transform.localPosition + (CellMetrics.GetFirstSolidCorner (d)) * 1/3f);
-            }
-        }
     }
 
     void TriangulateConnection (Cell cell, Direction direction) {
